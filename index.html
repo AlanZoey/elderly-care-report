@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="format-detection" content="telephone=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>深圳及周边养老机构清单与分析报告 | 自媒体选题策划</title>
+<style>
+  :root {
+    --primary: #1a5276;
+    --primary-light: #2980b9;
+    --accent: #e74c3c;
+    --accent-light: #c0392b;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --text: #2c3e50;
+    --text-light: #7f8c8d;
+    --border: #dce1e8;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  .header { background:linear-gradient(135deg, var(--primary), var(--primary-light)); color:#fff; padding:48px 20px 36px; text-align:center; position:relative; }
+  .header h1 { font-size:28px; font-weight:700; margin-bottom:8px; }
+  .header p { font-size:15px; opacity:.85; max-width:600px; margin:0 auto; }
+  .header .badge { display:inline-block; background:var(--accent); color:#fff; font-size:12px; padding:3px 10px; border-radius:20px; margin-top:10px; }
+  .container { max-width:1200px; margin:0 auto; padding:0 20px; }
+  .stats-bar { display:flex; gap:16px; margin-top:-24px; position:relative; z-index:10; flex-wrap:wrap; justify-content:center; }
+  .stat-card { background:var(--card-bg); border-radius:12px; padding:20px 28px; text-align:center; box-shadow:var(--shadow); flex:1; min-width:140px; }
+  .stat-card .num { font-size:32px; font-weight:700; color:var(--primary); }
+  .stat-card .label { font-size:13px; color:var(--text-light); margin-top:4px; }
+  .section { margin:32px 0; }
+  .section-title { font-size:20px; font-weight:700; color:var(--primary); margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+  .section-title .icon { width:28px; height:28px; background:var(--primary); color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .filter-btn { background:var(--card-bg); border:1px solid var(--border); padding:6px 16px; border-radius:20px; font-size:13px; cursor:pointer; transition:all .2s; color:var(--text); }
+  .filter-btn:hover, .filter-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .inst-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(360px,1fr)); gap:16px; }
+  .inst-card { background:var(--card-bg); border-radius:12px; padding:20px; box-shadow:var(--shadow); border-left:4px solid var(--primary); transition:transform .2s; position:relative; }
+  .inst-card:hover { transform:translateY(-2px); }
+  .inst-card.priority-1 { border-left-color:var(--accent); }
+  .inst-card.priority-2 { border-left-color:var(--warning); }
+  .inst-card.priority-3 { border-left-color:var(--success); }
+  .inst-card.priority-4 { border-left-color:var(--primary); }
+  .inst-card.priority-5 { border-left-color:#8e44ad; }
+  .inst-card .priority-badge { position:absolute; top:12px; right:12px; font-size:11px; padding:2px 8px; border-radius:12px; font-weight:600; }
+  .priority-1 .priority-badge { background:var(--accent); color:#fff; }
+  .priority-2 .priority-badge { background:var(--warning); color:#fff; }
+  .priority-3 .priority-badge { background:var(--success); color:#fff; }
+  .priority-4 .priority-badge { background:var(--primary); color:#fff; }
+  .priority-5 .priority-badge { background:#8e44ad; color:#fff; }
+  .inst-card .inst-name { font-size:17px; font-weight:700; margin-bottom:4px; }
+  .inst-card .inst-type { font-size:12px; color:var(--text-light); margin-bottom:10px; }
+  .inst-card .info-row { display:flex; align-items:flex-start; gap:6px; margin-bottom:6px; font-size:13px; }
+  .inst-card .info-row .key { color:var(--text-light); min-width:56px; }
+  .inst-card .info-row .val { color:var(--text); }
+  .inst-card .desc { font-size:13px; color:var(--text-light); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); }
+  .inst-card .media-tag { display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; margin-right:4px; margin-top:6px; }
+  .media-tag.story { background:#eaf2f8; color:var(--primary); }
+  .media-tag.visual { background:#fdebd0; color:var(--warning); }
+  .media-tag.interview { background:#e8f8f5; color:var(--success); }
+  .media-tag.compare { background:#f4ecf7; color:#8e44ad; }
+  .analysis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .analysis-card { background:var(--card-bg); border-radius:12px; padding:20px; box-shadow:var(--shadow); }
+  .analysis-card h3 { font-size:16px; font-weight:700; margin-bottom:12px; color:var(--primary); }
+  .analysis-card ul { list-style:none; }
+  .analysis-card li { font-size:13px; padding:6px 0; border-bottom:1px solid var(--border); }
+  .analysis-card li:last-child { border-bottom:none; }
+  .analysis-card li .tag { display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; margin-right:6px; }
+  .top5-list { counter-reset:top5; }
+  .top5-item { background:var(--card-bg); border-radius:12px; padding:20px 20px 20px 56px; box-shadow:var(--shadow); margin-bottom:12px; position:relative; counter-increment:top5; }
+  .top5-item::before { content:counter(top5); position:absolute; left:20px; top:18px; font-size:24px; font-weight:800; color:var(--accent); }
+  .top5-item h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
+  .top5-item .reason { font-size:13px; color:var(--text-light); margin-bottom:8px; }
+  .top5-item .plan { font-size:13px; color:var(--primary); }
+  .top5-item .plan span { font-weight:600; }
+  .timeline { background:var(--card-bg); border-radius:12px; padding:20px; box-shadow:var(--shadow); }
+  .timeline h3 { font-size:16px; font-weight:700; color:var(--primary); margin-bottom:16px; }
+  .tl-row { display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px dashed var(--border); }
+  .tl-row:last-child { border-bottom:none; }
+  .tl-phase { font-size:12px; padding:4px 10px; border-radius:16px; font-weight:600; min-width:64px; text-align:center; }
+  .tl-phase.p1 { background:var(--accent); color:#fff; }
+  .tl-phase.p2 { background:var(--warning); color:#fff; }
+  .tl-phase.p3 { background:var(--success); color:#fff; }
+  .tl-phase.p4 { background:var(--primary); color:#fff; }
+  .tl-content { font-size:13px; }
+  .footer { text-align:center; padding:32px 20px; color:var(--text-light); font-size:13px; border-top:1px solid var(--border); margin-top:40px; }
+  @media(max-width:768px) {
+    .inst-grid { grid-template-columns:1fr; }
+    .analysis-grid { grid-template-columns:1fr; }
+    .stats-bar { gap:8px; }
+    .stat-card { padding:14px 16px; }
+    .stat-card .num { font-size:24px; }
+  }
+  @media(max-width:480px) {
+    .header { padding:32px 16px 24px; }
+    .header h1 { font-size:20px; }
+    .header p { font-size:13px; }
+    .container { padding:0 12px; }
+    .section { margin:20px 0; }
+    .section-title { font-size:16px; margin-bottom:14px; }
+    .section-title .icon { width:24px; height:24px; font-size:12px; }
+    .inst-card { padding:14px; }
+    .inst-card .inst-name { font-size:15px; }
+    .inst-card .info-row { font-size:12px; }
+    .inst-card .info-row .key { min-width:44px; }
+    .inst-card .desc { font-size:12px; }
+    .inst-card .priority-badge { top:8px; right:8px; font-size:10px; }
+    .analysis-card { padding:14px; }
+    .analysis-card h3 { font-size:14px; }
+    .analysis-card li { font-size:12px; }
+    .top5-item { padding:14px 14px 14px 42px; }
+    .top5-item::before { font-size:18px; left:14px; top:12px; }
+    .top5-item h3 { font-size:14px; }
+    .top5-item .reason, .top5-item .plan { font-size:12px; }
+    .filter-btn { padding:6px 12px; font-size:12px; }
+    .tip-box { padding:10px 12px; font-size:12px; }
+    .tl-row { gap:8px; }
+    .tl-content { font-size:12px; }
+  }
+  .table-wrapper { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:12px; box-shadow:var(--shadow); }
+  @media(max-width:768px) {
+    table.comp-table { font-size:11px; min-width:600px; }
+    table.comp-table th, table.comp-table td { padding:6px 8px; }
+  }
+  .tip-box { background:#fef9e7; border:1px solid #f9e79f; border-radius:8px; padding:12px 16px; margin:12px 0; font-size:13px; color:#7d6608; }
+  table.comp-table { width:100%; border-collapse:collapse; font-size:13px; background:var(--card-bg); border-radius:12px; overflow:hidden; }
+  table.comp-table th { background:var(--primary); color:#fff; padding:10px 12px; text-align:left; }
+  table.comp-table td { padding:8px 12px; border-bottom:1px solid var(--border); }
+  table.comp-table tr:hover td { background:#f8f9fa; }
+  .tier-tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:12px; font-weight:600; }
+  .tier-tag.high { background:#fadbd8; color:var(--accent-light); }
+  .tier-tag.mid { background:#eaf2f8; color:var(--primary-light); }
+  .tier-tag.pub { background:#e8f8f5; color:var(--success); }
+  .tier-tag.basic { background:#f2f3f4; color:var(--text-light); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>深圳及周边养老机构清单与分析报告</h1>
+  <p>自媒体选题策划 · 养老机构拜访拍摄方案</p>
+  <span class="badge">2026年5月 · 第一版</span>
+</div>
+
+<div class="container">
+  <!-- 统计概览 -->
+  <div class="stats-bar">
+    <div class="stat-card"><div class="num">15</div><div class="label">收录机构总数</div></div>
+    <div class="stat-card"><div class="num">10</div><div class="label">深圳机构</div></div>
+    <div class="stat-card"><div class="num">3</div><div class="label">东莞机构</div></div>
+    <div class="stat-card"><div class="num">2</div><div class="label">惠州机构</div></div>
+    <div class="stat-card"><div class="num">5</div><div class="label">优先拜访数</div></div>
+  </div>
+
+  <!-- 提示 -->
+  <div class="tip-box">
+    <strong>数据说明：</strong>本报告信息基于公开网络资料整理，部分联系方式可能存在更新变动。建议拜访前通过官方渠道核实最新信息。标注 <strong style="color:var(--accent)">★ 优先拜访</strong> 的5家机构综合了话题性、视觉呈现力、差异化程度和受众关注度四个维度。
+  </div>
+
+  <!-- ========== 第一部分：深圳养老机构 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">1</span>深圳养老机构清单（10家）</div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterInst('all','sz')">全部</button>
+      <button class="filter-btn" onclick="filterInst('high','sz')">高端民办</button>
+      <button class="filter-btn" onclick="filterInst('mid','sz')">中端民办</button>
+      <button class="filter-btn" onclick="filterInst('pub','sz')">公办普惠</button>
+    </div>
+
+    <div class="inst-grid" id="sz-grid">
+
+      <!-- 1. 泰康之家·鹏园 -->
+      <div class="inst-card priority-1" data-tier="high">
+        <span class="priority-badge">★ 优先拜访 #1</span>
+        <div class="inst-name">泰康之家·鹏园</div>
+        <div class="inst-type">高端CCRC持续照料退休社区 · 保险系 · 医养结合</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市大鹏新区大鹏街道水头社区</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">400-846-5555（全国服务热线）</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">占地5.7万m²，约1300户/床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag high">高端</span> 面向高净值人群，月费8,000~25,000元+</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">四级照护体系（独立/协助/专业护理/记忆照护），配套泰康自营医疗中心，需购保险入住</span></div>
+        <div class="desc">深圳养老产业标杆项目，2023年开业。大鹏新区山海环境极佳，CCRC模式在全国属领先。自媒体角度：保险+养老模式解读、高端养老体验vlog、山海养老生活方式。高度差异化的话题素材。</div>
+        <div><span class="media-tag story">故事选题</span><span class="media-tag visual">视觉呈现</span><span class="media-tag compare">模式对比</span></div>
+      </div>
+
+      <!-- 2. 前海人寿幸福之家 -->
+      <div class="inst-card priority-2" data-tier="high">
+        <span class="priority-badge">★ 优先拜访 #2</span>
+        <div class="inst-name">前海人寿幸福之家养老院</div>
+        <div class="inst-type">高端养老社区 · 保险系 · 医养融合</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市宝安区新安街道兴华路南侧（宝安中心区）</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-2308 8888</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约500+床位/公寓</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag high">高端</span> 保险系养老社区，月费6,000~20,000元+</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">配套康复医院，医养融合，24小时照护，文娱活动丰富</span></div>
+        <div class="desc">与泰康鹏园形成"保险系养老"双案例对比。宝安中心区位置优越，城市养老vs山海养老的差异化叙事点。自媒体角度：两家保险养老的横向对比、城市核心区养老的便利性论证。</div>
+        <div><span class="media-tag compare">横向对比</span><span class="media-tag interview">采访素材</span><span class="media-tag visual">视觉呈现</span></div>
+      </div>
+
+      <!-- 3. 深圳任达养老集团 -->
+      <div class="inst-card priority-1" data-tier="mid">
+        <span class="priority-badge">★ 优先拜访 #3</span>
+        <div class="inst-name">深圳任达养老集团</div>
+        <div class="inst-type">中端连锁养老 · 医养护康教研一体 · 民办</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市宝安区洲石路旁（总部）</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-2837 6000</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">集团连锁运营，宝安等多点位布局</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag mid">中端</span> 普惠型民办连锁，性价比高</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">深圳本土深耕品牌，医养护康教研六位一体，多院区运营</span></div>
+        <div class="desc">深圳本土最大的民办养老品牌之一，深耕多年，口碑积累深厚。与高端保险系形成"价格梯度"对照。自媒体角度：本土养老品牌的成长故事、普惠养老的性价比分析、连锁运营模式解读。</div>
+        <div><span class="media-tag story">故事选题</span><span class="media-tag compare">模式对比</span><span class="media-tag interview">采访素材</span></div>
+      </div>
+
+      <!-- 4. 招商蛇口·颐养 -->
+      <div class="inst-card priority-3" data-tier="high">
+        <span class="priority-badge">★ 优先拜访 #4</span>
+        <div class="inst-name">招商蛇口·颐养之家</div>
+        <div class="inst-type">高端养老公寓 · 地产系 · 日式照护理念</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市南山区蛇口/太子湾片区</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-2682 0000</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约300余套养老公寓</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag high">高端</span> 滨海养老，月费6,000~20,000元+</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">日式照护理念，蛇口国际社区氛围，招商地产资源赋能</span></div>
+        <div class="desc">地产系养老的代表性项目，蛇口国际化社区是独特卖点。自媒体角度：地产转型养老的商业模式、日式照护理念的本地化实践、滨海养老生活方式。三大养老系（保险/地产/本土）的完整对比链。</div>
+        <div><span class="media-tag compare">横向对比</span><span class="media-tag story">故事选题</span><span class="media-tag visual">视觉呈现</span></div>
+      </div>
+
+      <!-- 5. 南山区社会福利中心 -->
+      <div class="inst-card priority-5" data-tier="pub">
+        <span class="priority-badge">★ 优先拜访 #5</span>
+        <div class="inst-name">深圳市南山区社会福利中心（颐养院）</div>
+        <div class="inst-type">公办养老机构 · 普惠型 · 医养结合</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市南山区西丽街道留仙大道与同发路交汇处</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-2662 0198 / 0755-8600 xxxx</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约300张床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag pub">公办普惠</span> 轮候制，优先困难群体</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">政府公办，环境优美，西丽片区交通便利，服务规范</span></div>
+        <div class="desc">公办养老的标杆样本。自媒体角度：公办vs民办的差异化体验、养老轮候制度的真实状况、"普惠养老"到底什么样。与前面4家高端/中端形成完整的价格梯度叙事。</div>
+        <div><span class="media-tag compare">横向对比</span><span class="media-tag story">故事选题</span><span class="media-tag interview">采访素材</span></div>
+      </div>
+
+      <!-- 6. 万科·榕悦养老公寓 -->
+      <div class="inst-card priority-4" data-tier="mid">
+        <div class="inst-name">万科·榕悦养老公寓</div>
+        <div class="inst-type">中高端养老 · 地产系 · 多区布局</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">福田区/南山区等多区域运营</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">400-888-7666（万科养老全国热线）</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">多院区布局，各区约100-200床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag mid">中高端</span> 品牌地产转型养老</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">万科品牌背书，社区嵌入式养老，多区布点灵活入住</span></div>
+        <div class="desc">万科旗下养老品牌，"城市养老"模式。自媒体角度：地产巨头转型养老的路径、社区嵌入式养老的便利性、多区布点的运营逻辑。可与招商蛇口颐养形成地产系养老内部对比。</div>
+        <div><span class="media-tag compare">模式对比</span><span class="media-tag story">故事选题</span></div>
+      </div>
+
+      <!-- 7. 福田区福利中心 -->
+      <div class="inst-card" data-tier="pub">
+        <div class="inst-name">深圳市福田区福利中心</div>
+        <div class="inst-type">公办养老机构 · 普惠型 · 区级</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市福田区景田东路</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-8309 xxxx（福田区民政局转接）</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约200+床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag pub">公办普惠</span> 优先辖区困难群体</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">福田核心区位，城市养老便利性突出</span></div>
+        <div class="desc">位于深圳最核心城区，公办养老"排队难"典型案例。自媒体角度：福田核心区公办养老的排队实况、城市中心养老的便利vs困难。</div>
+        <div><span class="media-tag interview">采访素材</span><span class="media-tag story">故事选题</span></div>
+      </div>
+
+      <!-- 8. 罗湖区社会福利中心 -->
+      <div class="inst-card" data-tier="pub">
+        <div class="inst-name">深圳市罗湖区社会福利中心</div>
+        <div class="inst-type">公办养老机构 · 普惠型 · 医养结合</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市罗湖区翠竹街道翠竹路1058号</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-2565 0615</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约260张床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag pub">公办普惠</span> 轮候制，优先困难群体</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">近年升级改造，医养结合，与周边医疗机构合作</span></div>
+        <div class="desc">罗湖区公办养老标杆，近年有升级改造，是"公办养老也在进步"的叙事素材。自媒体角度：公办养老升级改造的真实效果、老城区养老的便利性。</div>
+        <div><span class="media-tag story">故事选题</span><span class="media-tag interview">采访素材</span></div>
+      </div>
+
+      <!-- 9. 宝安区社会福利中心 -->
+      <div class="inst-card" data-tier="pub">
+        <div class="inst-name">深圳市宝安区社会福利中心</div>
+        <div class="inst-type">公办综合福利机构 · 养老+救助+助残</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">深圳市宝安区西乡街道黄田社区</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0755-2793 xxxx / 宝安区民政局0755-2788 2222</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约300+床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag pub">公办普惠</span> 综合性社会福利服务</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">集养老托老、社会救助、残疾人托养于一体</span></div>
+        <div class="desc">多功能综合福利机构，体现"社会福利中心"的复合角色。自媒体角度：公办养老与社会救助的边界、综合福利中心的日常。</div>
+        <div><span class="media-tag interview">采访素材</span></div>
+      </div>
+
+      <!-- 10. 光大养老·汇晨 -->
+      <div class="inst-card" data-tier="mid">
+        <div class="inst-name">光大养老·深圳汇晨养老</div>
+        <div class="inst-type">中高端连锁养老 · 金融系 · 标准化运营</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">南山区、宝安区等多区域布局</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">010-5900 xxxx（光大养老总部）/ 各项目本地电话</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">约200-300床位</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag mid">中高端</span> 金融央企旗下，连锁标准化</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">光大集团旗下，连锁运营，标准化照护服务</span></div>
+        <div class="desc">央企金融系入局养老的代表案例。自媒体角度：金融央企做养老的逻辑、连锁标准化vs个性化的平衡。与保险系（泰康/前海人寿）、地产系（招商/万科）形成"资本系养老"全景对比。</div>
+        <div><span class="media-tag compare">模式对比</span><span class="media-tag story">故事选题</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== 第二部分：东莞/惠州 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">2</span>东莞、惠州养老机构清单（5家）</div>
+
+    <div class="inst-grid" id="dg-hz-grid">
+
+      <!-- 东莞1 -->
+      <div class="inst-card priority-4" data-tier="pub">
+        <div class="inst-name">东莞市社会福利中心</div>
+        <div class="inst-type">公办综合福利机构 · 市级标杆</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">东莞市东城区莞长路东段</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0769-2261 0277</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">市级综合福利中心，床位规模较大</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag pub">公办普惠</span> 东莞市级公办标杆</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">市级综合福利中心，辐射全市，服务规范</span></div>
+        <div class="desc">东莞公办养老的市级标杆，与深圳公办养老可形成"同城vs临城"的对比叙事。自媒体角度：临深城市公办养老的体验、东莞养老政策与深圳的差异。</div>
+        <div><span class="media-tag compare">横向对比</span><span class="media-tag interview">采访素材</span></div>
+      </div>
+
+      <!-- 东莞2 -->
+      <div class="inst-card" data-tier="mid">
+        <div class="inst-name">东莞市金慈养老院</div>
+        <div class="inst-type">民办养老 · 中端 · 专业照护</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">东莞市南城区宏远路</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0769-2281 8818</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">中端民办养老院</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag mid">中端民办</span> 南城核心区位</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">民办专业照护，南城核心区便利</span></div>
+        <div class="desc">东莞民办养老的代表，位于南城核心区。自媒体角度：临深城市民办养老的市场空间、东莞vs深圳养老消费力的差异。</div>
+        <div><span class="media-tag compare">横向对比</span></div>
+      </div>
+
+      <!-- 东莞3 -->
+      <div class="inst-card" data-tier="basic">
+        <div class="inst-name">东莞市常平镇敬老院</div>
+        <div class="inst-type">镇级公办敬老院 · 基础保障型</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">东莞市常平镇还珠沥村</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0769-8339 1138</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">镇级敬老院</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag basic">基础保障</span> 镇级公办，托底保障</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">常平镇级公办，基础养老服务</span></div>
+        <div class="desc">镇级敬老院代表，展示中国基层养老的真实面貌。自媒体角度：基层养老的真实生活、镇级养老与城区养老的天壤之别。</div>
+        <div><span class="media-tag story">故事选题</span><span class="media-tag interview">采访素材</span></div>
+      </div>
+
+      <!-- 惠州1 -->
+      <div class="inst-card priority-4" data-tier="mid">
+        <div class="inst-name">惠州长者安养中心</div>
+        <div class="inst-type">市级公办养老机构 · 普惠型</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">惠州市惠城区江北片区</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0752-280 xxxx（惠州市民政局转接）</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">市级公办养老中心</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag pub">公办普惠</span> 惠州市级养老标杆</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">惠州市级公办，惠城江北核心区位</span></div>
+        <div class="desc">惠州公办养老标杆，与深圳/东莞公办养老形成"大湾区三城公办养老对比"系列。自媒体角度：三城公办养老的差异、惠州养老的性价比优势。</div>
+        <div><span class="media-tag compare">横向对比</span></div>
+      </div>
+
+      <!-- 惠州2 -->
+      <div class="inst-card" data-tier="basic">
+        <div class="inst-name">惠州市博罗县社会福利中心</div>
+        <div class="inst-type">县级公办福利机构 · 基础保障型</div>
+        <div class="info-row"><span class="key">地址</span><span class="val">惠州市博罗县罗阳街道</span></div>
+        <div class="info-row"><span class="key">电话</span><span class="val">0752-628 xxxx（博罗县民政局转接）</span></div>
+        <div class="info-row"><span class="key">规模</span><span class="val">县级福利中心</span></div>
+        <div class="info-row"><span class="key">定位</span><span class="val"><span class="tier-tag basic">基础保障</span> 县级公办，托底保障</span></div>
+        <div class="info-row"><span class="key">特色</span><span class="val">县级综合福利中心，辐射全县</span></div>
+        <div class="desc">县级养老的真实样本，与城区养老形成城乡差异对比。自媒体角度：县城养老的真实面貌、大湾区城乡养老的巨大落差。极具人文关怀价值。</div>
+        <div><span class="media-tag story">故事选题</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== 第三部分：综合对比表 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">3</span>养老机构综合对比表</div>
+    <div class="table-wrapper">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>机构名称</th>
+          <th>城市</th>
+          <th>层次定位</th>
+          <th>运营性质</th>
+          <th>资本背景</th>
+          <th>月费参考</th>
+          <th>拜访优先级</th>
+          <th>自媒体选题价值</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>泰康之家·鹏园</td><td>深圳</td><td><span class="tier-tag high">高端</span></td><td>民办</td><td>保险系（泰康）</td><td>8K~25K+</td><td style="color:var(--accent);font-weight:700">#1</td><td>★★★★★</td></tr>
+        <tr><td>前海人寿幸福之家</td><td>深圳</td><td><span class="tier-tag high">高端</span></td><td>民办</td><td>保险系（前海人寿）</td><td>6K~20K+</td><td style="color:var(--accent);font-weight:700">#2</td><td>★★★★★</td></tr>
+        <tr><td>深圳任达养老集团</td><td>深圳</td><td><span class="tier-tag mid">中端</span></td><td>民办</td><td>本土民营</td><td>3K~8K</td><td style="color:var(--accent);font-weight:700">#3</td><td>★★★★★</td></tr>
+        <tr><td>招商蛇口·颐养之家</td><td>深圳</td><td><span class="tier-tag high">高端</span></td><td>民办</td><td>地产系（招商）</td><td>6K~20K+</td><td style="color:var(--accent);font-weight:700">#4</td><td>★★★★☆</td></tr>
+        <tr><td>南山区社会福利中心</td><td>深圳</td><td><span class="tier-tag pub">公办普惠</span></td><td>公办</td><td>政府公办</td><td>1K~3K</td><td style="color:var(--accent);font-weight:700">#5</td><td>★★★★☆</td></tr>
+        <tr><td>万科·榕悦养老公寓</td><td>深圳</td><td><span class="tier-tag mid">中高端</span></td><td>民办</td><td>地产系（万科）</td><td>4K~12K</td><td>#6</td><td>★★★☆☆</td></tr>
+        <tr><td>福田区福利中心</td><td>深圳</td><td><span class="tier-tag pub">公办普惠</span></td><td>公办</td><td>政府公办</td><td>1K~3K</td><td>#7</td><td>★★★☆☆</td></tr>
+        <tr><td>罗湖区社会福利中心</td><td>深圳</td><td><span class="tier-tag pub">公办普惠</span></td><td>公办</td><td>政府公办</td><td>1K~3K</td><td>#8</td><td>★★★☆☆</td></tr>
+        <tr><td>宝安区社会福利中心</td><td>深圳</td><td><span class="tier-tag pub">公办普惠</span></td><td>公办</td><td>政府公办</td><td>1K~3K</td><td>#9</td><td>★★☆☆☆</td></tr>
+        <tr><td>光大养老·汇晨</td><td>深圳</td><td><span class="tier-tag mid">中高端</span></td><td>民办</td><td>金融央企（光大）</td><td>4K~10K</td><td>#10</td><td>★★★☆☆</td></tr>
+        <tr><td>东莞市社会福利中心</td><td>东莞</td><td><span class="tier-tag pub">公办普惠</span></td><td>公办</td><td>政府公办</td><td>1K~2K</td><td>#11</td><td>★★★☆☆</td></tr>
+        <tr><td>东莞市金慈养老院</td><td>东莞</td><td><span class="tier-tag mid">中端民办</span></td><td>民办</td><td>本地民营</td><td>2K~5K</td><td>#12</td><td>★★☆☆☆</td></tr>
+        <tr><td>东莞常平镇敬老院</td><td>东莞</td><td><span class="tier-tag basic">基础保障</span></td><td>公办</td><td>镇级政府</td><td>~1K</td><td>#13</td><td>★★☆☆☆</td></tr>
+        <tr><td>惠州长者安养中心</td><td>惠州</td><td><span class="tier-tag pub">公办普惠</span></td><td>公办</td><td>政府公办</td><td>1K~2K</td><td>#14</td><td>★★★☆☆</td></tr>
+        <tr><td>博罗县社会福利中心</td><td>惠州</td><td><span class="tier-tag basic">基础保障</span></td><td>公办</td><td>县级政府</td><td>~1K</td><td>#15</td><td>★★☆☆☆</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- ========== 第四部分：分析报告 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">4</span>市场分析与自媒体选题洞察</div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <h3>深圳养老市场格局</h3>
+        <ul>
+          <li><span class="tag" style="background:#fadbd8;color:var(--accent)">高端</span> 保险系/地产系入局，月费6K~25K，面向高净值人群，占比约20%</li>
+          <li><span class="tag" style="background:#eaf2f8;color:var(--primary)">中端</span> 本土民营+金融央企，月费3K~10K，性价比导向，占比约30%</li>
+          <li><span class="tag" style="background:#e8f8f5;color:var(--success)">公办</span> 政府兜底，月费1K~3K，轮候制排队难，占比约50%</li>
+          <li>深圳全市约60+家养老机构，床位1万+张，"9073"模式推进中</li>
+          <li>三大资本系格局：保险系（泰康/前海人寿）、地产系（招商/万科）、金融央企系（光大）</li>
+        </ul>
+      </div>
+
+      <div class="analysis-card">
+        <h3>自媒体选题矩阵</h3>
+        <ul>
+          <li><span class="tag" style="background:#eaf2f8;color:var(--primary)">体验Vlog</span> 高端养老的一天/一周沉浸体验（泰康鹏园、招商颐养）</li>
+          <li><span class="tag" style="background:#fdebd0;color:var(--warning)">横向对比</span> 保险系vs地产系vs本土系养老横评系列（3期+）</li>
+          <li><span class="tag" style="background:#e8f8f5;color:var(--success)">人物故事</span> 入住老人的真实选择故事、养老从业者的日常</li>
+          <li><span class="tag" style="background:#f4ecf7;color:#8e44ad">深度解读</span> 深圳养老排队实况、公办vs民办的真实差距</li>
+          <li><span class="tag" style="background:#fadbd8;color:var(--accent)">跨城对比</span> 深圳/东莞/惠州三城养老性价比横评</li>
+        </ul>
+      </div>
+
+      <div class="analysis-card">
+        <h3>受众关注痛点</h3>
+        <ul>
+          <li>深圳公办养老排队要多久？真实数据揭秘</li>
+          <li>月费1万的高端养老，到底值不值？</li>
+          <li>保险入住门槛 vs 现金入住：哪条路更划算？</li>
+          <li>父母养老，选深圳还是选东莞惠州？</li>
+          <li>医养结合≠有医院：哪些是真医养、哪些是噱头？</li>
+          <li>从地产到养老：万科招商光大为何纷纷转型？</li>
+        </ul>
+      </div>
+
+      <div class="analysis-card">
+        <h3>内容差异化策略</h3>
+        <ul>
+          <li>避开"养老科普"赛道，切入"养老消费决策"赛道</li>
+          <li>用横评对比建立权威性（保险系vs地产系vs公办系）</li>
+          <li>用沉浸体验建立视觉吸引力（高端养老vlog）</li>
+          <li>用人物故事建立情感共鸣（老人真实选择）</li>
+          <li>用数据解读建立专业度（排队数据、费用拆解）</li>
+          <li>跨城对比是蓝海选题：极少有人做深圳/东莞/惠州养老对比</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 第五部分：优先拜访5家 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">5</span>优先拜访的5家机构（含拜访方案）</div>
+
+    <div class="tip-box">
+      优先级排序依据：①话题性（是否能产出爆款选题） ②视觉呈现力（拍摄效果） ③差异化程度（是否有独特叙事点） ④受众关注度（是否命中用户痛点）
+    </div>
+
+    <div class="top5-list">
+
+      <div class="top5-item">
+        <h3>泰康之家·鹏园</h3>
+        <div class="reason">理由：深圳养老产业最高标杆，CCRC模式全国领先，大鹏山海环境视觉极佳，保险+养老模式具有强话题性</div>
+        <div class="plan"><span>拍摄方案：</span>沉浸式vlog（1天体验）+ 保险入住门槛解读 + 山海养老环境拍摄 + 照护体系专题。建议预约2次拜访：1次体验拍摄，1次深度采访。</div>
+      </div>
+
+      <div class="top5-item">
+        <h3>前海人寿幸福之家养老院</h3>
+        <div class="reason">理由：与泰康鹏园构成"保险系养老双案例"，宝安中心区城市养老vs大鹏山海养老的绝佳对比素材</div>
+        <div class="plan"><span>拍摄方案：</span>与泰康鹏园联动拍摄"保险系养老横评"专题（2家对比1期）+ 城市中心养老便利性论证 + 医养融合实况。建议与泰康鹏园同一周拜访。</div>
+      </div>
+
+      <div class="top5-item">
+        <h3>深圳任达养老集团</h3>
+        <div class="reason">理由：深圳本土最大民办品牌，深耕多年口碑好，与高端保险系形成"价格梯度"对照，性价比话题命中用户痛点</div>
+        <div class="plan"><span>拍摄方案：</span>本土养老品牌故事 + 普惠养老真实体验 + 高端vs中端价格梯度对比。建议采访创始人/运营负责人，挖掘品牌故事。</div>
+      </div>
+
+      <div class="top5-item">
+        <h3>招商蛇口·颐养之家</h3>
+        <div class="reason">理由：地产系养老代表，日式照护理念差异化，蛇口国际社区独特卖点。与保险系（泰康/前海人寿）、本土系（任达）构成"三大养老系"完整对比链</div>
+        <div class="plan"><span>拍摄方案：</span>地产转型养老模式解读 + 日式照护理念体验 + 蛇口滨海养老拍摄。建议作为"三大养老系横评"第三站。</div>
+      </div>
+
+      <div class="top5-item">
+        <h3>深圳市南山区社会福利中心（颐养院）</h3>
+        <div class="reason">理由：公办养老标杆样本，与前面4家高端/中端形成"完整价格梯度"叙事。"公办排队到底多久"命中最大用户痛点</div>
+        <div class="plan"><span>拍摄方案：</span>公办养老真实体验 + 排队轮候制度解读 + 公办vs民办差异化对比。建议采访入住老人和工作人员，获取排队真实数据。</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== 第六部分：拜访时间线 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">6</span>建议拜访拍摄时间线</div>
+
+    <div class="timeline">
+      <h3>四周分阶段拜访计划</h3>
+
+      <div class="tl-row">
+        <span class="tl-phase p1">第1周</span>
+        <span class="tl-content"><strong>保险系养老横评：</strong>泰康鹏园 + 前海人寿幸福之家（2家联动，产出1期横评+2期单家体验vlog）</span>
+      </div>
+      <div class="tl-row">
+        <span class="tl-phase p2">第2周</span>
+        <span class="tl-content"><strong>本土+地产系横评：</strong>任达养老集团 + 招商蛇口颐养之家（产出1期横评+品牌故事+日式照护专题）</span>
+      </div>
+      <div class="tl-row">
+        <span class="tl-phase p3">第3周</span>
+        <span class="tl-content"><strong>公办养老专题：</strong>南山区社会福利中心 + 福田区福利中心（产出1期公办养老体验+排队数据解读）</span>
+      </div>
+      <div class="tl-row">
+        <span class="tl-phase p4">第4周</span>
+        <span class="tl-content"><strong>跨城对比：</strong>东莞社会福利中心 + 惠州长者安养中心（产出1期三城养老性价比横评）</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 预估产出 ========== -->
+  <div class="section">
+    <div class="section-title"><span class="icon">7</span>预估内容产出清单</div>
+
+    <div class="analysis-card">
+      <h3>首批拜访可产出内容矩阵（约15~20条）</h3>
+      <ul>
+        <li>沉浸体验vlog × 5（每家1条，5~10分钟/条）</li>
+        <li>横评对比专题 × 3（保险系横评、三大系横评、三城横评）</li>
+        <li>人物故事 × 3~5（入住老人故事、从业者故事）</li>
+        <li>数据解读 × 2（排队数据、费用拆解）</li>
+        <li>模式解读 × 2（CCRC模式、地产转型养老）</li>
+        <li>短图文/短视频 × 5~8（探店笔记、费用对比图、环境展示）</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>深圳及周边养老机构清单与分析报告 · 自媒体选题策划 · 2026年5月</p>
+  <p style="margin-top:8px;font-size:12px;">数据来源：深圳市民政局、各区民政局官网、东莞市民政局、惠州市民政局及公开网络资料。部分联系方式需通过官方渠道核实。</p>
+</div>
+
+<script>
+function filterInst(tier, region) {
+  const grid = document.getElementById(region === 'sz' ? 'sz-grid' : 'dg-hz-grid');
+  const cards = grid.querySelectorAll('.inst-card');
+  const btns = document.querySelectorAll('.filter-bar .filter-btn');
+
+  btns.forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  cards.forEach(c => {
+    if (tier === 'all') {
+      c.style.display = '';
+    } else {
+      c.style.display = c.dataset.tier === tier ? '' : 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
